@@ -54,7 +54,7 @@ class ApkDiff:
 
         success = True
         for firstEntryInfo in firstInfoList:
-            for secondEntryInfo in list(secondInfoList):
+            for secondEntryInfo in secondInfoList:
                 if firstEntryInfo.filename == secondEntryInfo.filename:
                     firstEntryBytes = firstZip.read(firstEntryInfo.filename)
                     secondEntryBytes = secondZip.read(secondEntryInfo.filename)
