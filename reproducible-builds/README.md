@@ -9,6 +9,7 @@ The command-line instructions in this guide are written for Linux, but you can a
 In the following sections, we will use Signal version `7.7.0` as the reference example. Simply replace all occurrences of `7.7.0` with the version number you are about to verify.
 
 ## Overview of the process
+
 Completing the reproducible build process verifies that the code in our public repository is exactly the same code that's running on your device.
 
 Signal is built using [app bundles](https://developer.android.com/guide/app-bundle), which means that the Play Store builds a set of APKs that only include the resources that are needed for your specific device. This adds a couple of extra steps, but overall the process is still relatively straightforward:
@@ -23,20 +24,22 @@ Signal is built using [app bundles](https://developer.android.com/guide/app-bund
 
 With that in mind, let's begin!
 
-
 ## Step-by-step instructions
 
 ### 0. Prerequisites
+
 Before you begin, ensure you have the following installed:
+
 - `git`
 - `docker`
 - `python` (version 3.x)
-- `adb` ([link](https://developer.android.com/tools/adb))
-- `bundletool` ([link](https://github.com/google/bundletool/releases))
+- [`adb`](https://developer.android.com/tools/adb)
+- [`bundletool`](https://github.com/google/bundletool/releases)
 
-You will also need to have Developer Options and USB Debugging enabled on your Android device. You can find instructions to do so [here](https://developer.android.com/studio/debug/dev-options). After the prerequisites are installed and the dev options are enabled, you can connect your Android device to your computer and run the `adb devices` command in your terminal. If everything has been set up correctly, your Android device will show up in the list.
+You will also need to have Developer Options and USB Debugging enabled on your Android device. See [the instructions](https://developer.android.com/studio/debug/dev-options). After the prerequisites are installed and the dev options are enabled, you can connect your Android device to your computer and run the `adb devices` command in your terminal. If everything has been set up correctly, your Android device will show up in the list.
 
 ### 1. Setting up directories
+
 First, let's create a new directory for our reproducible builds. In your home directory (`~`), create a new directory called `reproducible-signal`:
 
 ```bash
@@ -62,7 +65,7 @@ Next, use `git` to clone that specific version. The tag consists of the version 
 git clone --depth 1 --branch v7.7.0 https://github.com/signalapp/Signal-Android.git
 ```
 
-You can also download an archive of the source code for a specific tag [here](https://github.com/signalapp/Signal-Android/tags).
+You can also download an [archive](https://github.com/signalapp/Signal-Android/tags) of the source code for a specific tag.
 
 Now we can switch to the `reproducible-builds` directory in the Signal repo we just cloned and build the Docker image that we'll use to build Signal in a reproducible manner. Building the Docker image might take a while depending on your network connection.
 
@@ -106,7 +109,7 @@ bundletool build-apks --bundle=bundle.aab --output-format=DIRECTORY --output=apk
 
 Afterwards, your project directory should now look something like this:
 
-```
+```txt
 reproducible-signal
 |_apks-from-device
 |_apks-i-built
@@ -123,7 +126,7 @@ reproducible-signal
 
 At this point, we recommend cleaning things up a bit and deleting the stuff you no longer need. The remaining instructions will assume you have a directory structure and file layout that looks like this:
 
-```
+```txt
 reproducible-signal
 |_apks-from-device
 |_apks-i-built
@@ -148,7 +151,7 @@ adb shell pm path org.thoughtcrime.securesms | sed 's/package://' | xargs -I{} a
 
 If everything went well, your directory structure should now look something like this:
 
-```
+```txt
 reproducible-signal
 |_apks-from-device
   |_base.apk
@@ -241,7 +244,7 @@ bundletool check-transparency \
 
 The command above will output the code transparency results, including a certificate fingerprint. You can verify that this matches the code transparency fingerprint:
 
-```
+```txt
 57 24 B1 15 23 8C 7B 03 E2 6A D9 01 34 FC 77 C5 7B 69 E7 ED DE 3B 70 C2 A7 8E C7 A5 58 3E FC 8E
 ```
 
