@@ -78,3 +78,5 @@ kls_database.db
 .gitattributes
 .github
 .gitmodules
+# Prevents accidental config.ini misconfiguration
+**/*.ini

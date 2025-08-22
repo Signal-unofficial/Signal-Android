@@ -1,0 +1,11 @@
+services:
+  'build':
+    container_name: 'bundler'
+    build:
+      context: './reproducible-builds/'
+      dockerfile: './Dockerfile'
+      target: 'build'
+    volumes:
+      - type: 'bind'
+        source: './'
+        target: '/project/'
