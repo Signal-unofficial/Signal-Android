@@ -9,3 +9,16 @@ services:
       - type: 'bind'
         source: './'
         target: '/project/'
+  'package':
+    container_name: 'packager'
+    # depends_on:
+    #   'build':
+    #     condition: 'service_completed_successfully'
+    build:
+      context: './reproducible-builds/'
+      dockerfile: './Dockerfile'
+      target: 'package'
+    volumes:
+      - type: 'bind'
+        source: './app/build/outputs/'
+        target: '/project/'
