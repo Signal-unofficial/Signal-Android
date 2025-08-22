@@ -67,26 +67,14 @@ git clone --depth 1 --branch v7.7.0 https://github.com/signalapp/Signal-Android.
 
 You can also download an [archive](https://github.com/signalapp/Signal-Android/tags) of the source code for a specific tag.
 
-Now we can switch to the `reproducible-builds` directory in the Signal repo we just cloned and build the Docker image that we'll use to build Signal in a reproducible manner. Building the Docker image might take a while depending on your network connection.
-
-> Note: Although the names may look similar at first, the `reproducible-builds` directory in the Signal git repository that is specified below is different than the `reproducible-signal` directory that we created in step 1 to store the APKs.
-
-```bash
-# Move into the right directory
-cd Signal-Android/reproducible-builds
-
-# Build the Docker image
-docker build -t signal-android .
-```
-
-Now we are ready to start building the Signal Android app bundle. The following commands will invoke the `bundlePlayProdRelease` Gradle task in a container that uses the Docker image we just built. Again, this may take a while depending on your network connection and CPU.
+Now we are ready to start building the Signal Android app bundle.
+The following commands will invoke the `bundlePlayProdRelease` Gradle task
+in a container that uses the Docker image we just built.
+This may take a while depending on your network connection and CPU.
 
 ```bash
-# Move back to the root of the repository
-cd ..
-
 # Build the app
-docker run --rm -v "$(pwd)":/project -w /project --user "$(id -u):$(id -g)" signal-android ./gradlew bundlePlayProdRelease
+docker-compose up -d build
 ```
 
 After that's done, you have your app bundle! It's located in `app/build/outputs/bundle/playProdRelease`. Let's copy it into the directory we set up in the first step:
