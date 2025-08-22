@@ -22,3 +22,19 @@ services:
       - type: 'bind'
         source: './app/build/outputs/'
         target: '/project/'
+  'run':
+    container_name: 'emulator'
+    # depends_on:
+    #   'package':
+    #     condition: 'service_completed_successfully'
+    build:
+      context: './reproducible-builds/'
+      dockerfile: './Dockerfile'
+      target: 'emulate'
+    ports:
+      - ':8080'
+      - ':8081'
+    volumes:
+      - type: 'bind'
+        source: './app/build/outputs/apks/splits/'
+        target: '/project/'

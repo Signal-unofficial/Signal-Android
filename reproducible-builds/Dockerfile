@@ -25,7 +25,10 @@ ARG ANDROID_API_LEVELS=android-35
 ARG ANDROID_BUILD_TOOLS_VERSION=35.0.0
 
 ENV ANDROID_SDK_ROOT=/usr/local/android-sdk-linux
-ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/tools:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/bin
+ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/tools:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/bin:${ANDROID_SDK_ROOT}/emulator
+
+# Used to qualify the type of Android Virtual Device (AVD) to create
+ENV AVD_PACKAGE="system-images;android-35;google_apis;x86_64"
 
 VOLUME [ "/project" ]
 
@@ -37,16 +40,19 @@ RUN \
     unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d ${ANDROID_SDK_ROOT} && \
     rm "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" && \
     apt-get remove -y unzip - && \
-    yes | sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" --update && \
-    yes | sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" \
+    yes | sdkmanager --update && \
+    yes | sdkmanager \
         "platforms;${ANDROID_API_LEVELS}" \
         "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
         "extras;google;m2repository" \
         "extras;android;m2repository" \
         "extras;google;google_play_services" \
         "ndk;28.0.13004108" \
-        "cmake;3.22.1" && \
-    yes | sdkmanager --sdk_root="${ANDROID_SDK_ROOT}" --licenses && \
+        "cmake;3.22.1" \
+        "platform-tools" \
+        "emulator" \
+        "${AVD_PACKAGE}" && \
+    yes | sdkmanager --licenses && \
     rm -rf ${ANDROID_SDK_ROOT}/tools && \
     git config --global --add safe.directory /project
 
@@ -76,3 +82,19 @@ ENTRYPOINT [ \
     "--output-format=DIRECTORY", \
     "--output=apks" \
 ]
+
+# Installs the APKs on an emulator
+FROM build AS emulate
+
+WORKDIR /project/
+COPY [ "./docker/docker-entrypoint.sh", "/usr/local/bin/docker-entrypoint.sh" ]
+
+ENV APK=./base-master.apk
+
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
+EXPOSE 8080/tcp 8080/udp 8081/tcp
+
+# Args are sent to avdmanager to create the AVD to emulate
+ENV ANDROID_AVD_HOME=/root/.android/avd
+ENV AVD_NAME=test-device
+CMD [ "-d", "desktop_large" ]
