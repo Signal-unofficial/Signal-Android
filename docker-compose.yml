@@ -24,16 +24,17 @@ services:
         target: '/project/'
   'run':
     container_name: 'emulator'
-    # depends_on:
-    #   'package':
-    #     condition: 'service_completed_successfully'
     build:
       context: './reproducible-builds/'
       dockerfile: './Dockerfile'
       target: 'emulate'
     gpus: 'all'
+    devices:
+      - source: '/dev/kvm' # Even works with WSL2 (not WSL1)
+        target: '/dev/kvm'
+        permissions: 'rw'
     ports:
-      - ':8080'
+      - ':5554'
       - ':8081'
     volumes:
       - type: 'bind'

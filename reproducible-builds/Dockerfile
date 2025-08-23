@@ -1,7 +1,7 @@
-ARG UBUNTU=ubuntu:jammy-20230624@sha256:b060fffe8e1561c9c3e6dea6db487b900100fc26830b9ea2ec966c151ab4c020
+ARG BASE_IMAGE=ubuntu:jammy-20230624@sha256:b060fffe8e1561c9c3e6dea6db487b900100fc26830b9ea2ec966c151ab4c020
 
-# Bundles the project
-FROM ${UBUNTU} AS build
+# Base image with custom apt mirror
+FROM ${BASE_IMAGE} AS base
 
 WORKDIR /etc/apt/
 RUN [ "mv", "./sources.list", "./sources.list.old" ]
@@ -15,6 +15,12 @@ RUN \
     apt-get update -o 'Dir::Etc::sourcelist=./sources.list.old' && \
     apt-get install -o 'Dir::Etc::sourcelist=./sources.list.old' -y ca-certificates && \
     # Back to normal, using our mirror.
+    apt-get clean
+
+# Bundles the project
+FROM base AS build
+
+RUN \
     apt-get update && \
     apt-get install -y git openjdk-17-jdk unzip && \
     apt-get clean
@@ -56,7 +62,9 @@ RUN \
     rm -rf ${ANDROID_HOME}/tools
 
 VOLUME [ "/project" ]
-RUN git config --global --add safe.directory /project
+RUN \
+    git config --global --add safe.directory /project && \
+    apt-get remove -y git
 
 # Bundling project
 WORKDIR /project/
@@ -93,7 +101,6 @@ FROM build AS emulate
 RUN \
     apt-get install -y \
         bridge-utils \
-        # kmod \
         libvirt-clients \
         libvirt-daemon-system \
         qemu-kvm && \
@@ -116,10 +123,13 @@ RUN \
 WORKDIR /project/
 COPY [ "./docker/docker-entrypoint.sh", "/usr/local/bin/docker-entrypoint.sh" ]
 
-ENV APK=./base-master.apk
-
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
-EXPOSE 8080/tcp 8080/udp 8081/tcp
+ENV EMULATOR_PORT=5554
+EXPOSE ${EMULATOR_PORT} 8081
+
+ENV APKS='base-master-signed.apk base-xxhdpi-signed.apk base-x86_64-signed.apk'
+ENV APK_ALIAS='Signal'
+ENV EMULATOR_ARGS='-no-snapshot -no-passive-gps -no-location-ui -no-audio -no-boot-anim -netdelay none'
 
 # Args are sent to avdmanager to create the AVD to emulate
 ENV ANDROID_AVD_HOME=/root/.android/avd

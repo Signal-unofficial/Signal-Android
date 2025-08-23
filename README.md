@@ -6,18 +6,22 @@ Signal uses your phone's data connection (WiFi/3G/4G/5G) to communicate securely
 
 Currently available on the Play Store and [signal.org](https://signal.org/android/apk/).
 
-<a href='https://play.google.com/store/apps/details?id=org.thoughtcrime.securesms&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/></a>
+<a href='https://play.google.com/store/apps/details?id=org.thoughtcrime.securesms&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+  <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>
+</a>
 
 ## Contributing Bug reports
+
 We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
-https://github.com/signalapp/Signal-Android/issues
+[https://github.com/signalapp/Signal-Android/issues]
 
 ## Joining the Beta
+
 Want to live life on the bleeding edge and help out with testing?
 
 You can subscribe to Signal Android Beta releases here:
-https://play.google.com/apps/testing/org.thoughtcrime.securesms
+[https://play.google.com/apps/testing/org.thoughtcrime.securesms]
 
 If you're interested in a life of peace and tranquility, stick with the standard releases.
 
@@ -28,34 +32,75 @@ If you're new to the Signal codebase, we recommend going through our issues and 
 For larger changes and feature ideas, we ask that you propose it on the [unofficial Community Forum](https://community.signalusers.org) for a high-level discussion with the wider community before implementation.
 
 ## Contributing Ideas
+
 Have something you want to say about Signal projects or want to be part of the conversation? Get involved in the [community forum](https://community.signalusers.org).
 
 Help
+
 ====
+
 ## Support
+
 For troubleshooting and questions, please visit our support center!
 
-https://support.signal.org/
+[https://support.signal.org/]
 
 ## Documentation
+
 Looking for documentation? Check out the wiki!
 
-https://github.com/signalapp/Signal-Android/wiki
+[https://github.com/signalapp/Signal-Android/wiki]
 
-# Legal things
-## Cryptography Notice
+## Building from Source
 
-This distribution includes cryptographic software. The country in which you currently reside may have restrictions on the import, possession, use, and/or re-export to another country, of encryption software.
-BEFORE using any encryption software, please check your country's laws, regulations and policies concerning the import, possession, or use, and re-export of encryption software, to see if this is permitted.
+- Install Docker Desktop
+- Install a Java JDK (at least version 17; JRE is not enough)
+- Run `docker-compose up -d build` to create a `.aab` file.
+  Note that from scratch, this operation takes about an hour and 16GB of RAM,
+  so this would ideally be done on a device with more than 16GB of RAM.
+- When the build completes, run `docker-compose up -d package`
+  to create unsigned `.apk` files in `./app/build/outputs/apks/splits`.
+  This operation is significantly faster.
+- Run `./gen-keystore` to generate the keys necessary for signing the APKs.
+  Use a unique, secure password that you'll remember, as you'll
+  need it in later steps. Note that in a production setting, this file would
+  not be regenerated frequently, but rather reused until its expiry nears.
+- Copy and paste the file in the same directory,
+  naming it `base-master-signed.apk`
+- Do the same for `base-xxhdpi.apk` and `base-x86_64.apk`, creating
+  `base-xxhdpi-signed.apk` and `base-x86_64-signed.apk`
+- Run `./sign-apk ./app/build/outputs/apks/splits/APK_NAME_HERE.apk`
+  to sign each APK, replacing `APK_NAME_HERE.apk` with the actual APK name.
+- Run `docker-compose up -d run` to run an emulator with the APKs installed.
+  Docker will expose the emulator on a random port
+  (e.g, the `50000` in `50000:5554`) accessible in your browser
+  (i.e, `localhost:50000`).
+
+## Legal things
+
+### Cryptography Notice
+
+This distribution includes cryptographic software. The country in which you
+currently reside may have restrictions on the import, possession, use, and/or
+re-export to another country, of encryption software.
+BEFORE using any encryption software, please check your country's laws,
+regulations and policies concerning the import, possession, or use, and
+re-export of encryption software, to see if this is permitted.
 See <http://www.wassenaar.org/> for more information.
 
-The U.S. Government Department of Commerce, Bureau of Industry and Security (BIS), has classified this software as Export Commodity Control Number (ECCN) 5D002.C.1, which includes information security software using or performing cryptographic functions with asymmetric algorithms.
-The form and manner of this distribution makes it eligible for export under the License Exception ENC Technology Software Unrestricted (TSU) exception (see the BIS Export Administration Regulations, Section 740.13) for both object code and source code.
+The U.S. Government Department of Commerce, Bureau of Industry and Security
+(BIS), has classified this software as Export Commodity Control Number (ECCN)
+5D002.C.1, which includes information security software using or performing
+cryptographic functions with asymmetric algorithms.
+The form and manner of this distribution makes it eligible for export under
+the License Exception ENC Technology Software Unrestricted (TSU) exception
+(see the BIS Export Administration Regulations, Section 740.13) for both
+object code and source code.
 
-## License
+### License
 
 Copyright 2013-2025 Signal Messenger, LLC
 
-Licensed under the GNU AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
+Licensed under the GNU AGPLv3: [https://www.gnu.org/licenses/agpl-3.0.html]
 
 Google Play and the Google Play logo are trademarks of Google LLC.
