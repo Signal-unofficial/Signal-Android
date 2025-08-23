@@ -31,6 +31,7 @@ services:
       context: './reproducible-builds/'
       dockerfile: './Dockerfile'
       target: 'emulate'
+    gpus: 'all'
     ports:
       - ':8080'
       - ':8081'

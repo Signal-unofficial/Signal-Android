@@ -9,7 +9,15 @@ avdmanager --silent create avd \
     -k "${AVD_PACKAGE}" \
     -p "${REAL_AVD_DIR}" \
     $@
-emulator -avd "${AVD_NAME}" &
+emulator \
+    -avd "${AVD_NAME}" \
+    -no-metrics \
+    -noaudio \
+    -no-boot-anim \
+    -netdelay none \
+    -no-window \
+    -no-snapshot \
+    &
 
 # Installing APK(s)
 adb install -t "${APK}"

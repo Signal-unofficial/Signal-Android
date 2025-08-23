@@ -19,27 +19,30 @@ RUN \
     apt-get install -y git openjdk-17-jdk unzip && \
     apt-get clean
 
+# Installing Android SDK
 ARG ANDROID_COMMAND_LINE_TOOLS_FILENAME=commandlinetools-linux-10406996_latest.zip
 ARG ANDROID_COMMAND_LINE_TOOLS_HASH=sha256:8919e8752979db73d8321e9babe2caedcc393750817c1a5f56c128ec442fb540
 ARG ANDROID_API_LEVELS=android-35
 ARG ANDROID_BUILD_TOOLS_VERSION=35.0.0
 
-ENV ANDROID_SDK_ROOT=/usr/local/android-sdk-linux
-ENV PATH=${PATH}:${ANDROID_SDK_ROOT}/tools:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/cmdline-tools/bin:${ANDROID_SDK_ROOT}/emulator
+ENV ANDROID_HOME=/root/Android/Sdk
 
-# Used to qualify the type of Android Virtual Device (AVD) to create
-ENV AVD_PACKAGE="system-images;android-35;google_apis;x86_64"
-
-VOLUME [ "/project" ]
-
-WORKDIR ${ANDROID_SDK_ROOT}
+WORKDIR ${ANDROID_HOME}
 ADD --checksum=${ANDROID_COMMAND_LINE_TOOLS_HASH} \
     "https://dl.google.com/android/repository/${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" \
     './'
 RUN \
-    unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d ${ANDROID_SDK_ROOT} && \
+    unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d "${ANDROID_HOME}/cmdline-tools" && \
     rm "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" && \
-    apt-get remove -y unzip - && \
+    apt-get remove -y unzip
+
+# Hack to put the SDK in the expected location
+WORKDIR ${ANDROID_HOME}/cmdline-tools
+RUN mv "./cmdline-tools" "./latest"
+ENV PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/emulator
+
+# Instaling dependencies
+RUN \
     yes | sdkmanager --update && \
     yes | sdkmanager \
         "platforms;${ANDROID_API_LEVELS}" \
@@ -48,14 +51,14 @@ RUN \
         "extras;android;m2repository" \
         "extras;google;google_play_services" \
         "ndk;28.0.13004108" \
-        "cmake;3.22.1" \
-        "platform-tools" \
-        "emulator" \
-        "${AVD_PACKAGE}" && \
+        "cmake;3.22.1"  && \
     yes | sdkmanager --licenses && \
-    rm -rf ${ANDROID_SDK_ROOT}/tools && \
-    git config --global --add safe.directory /project
+    rm -rf ${ANDROID_HOME}/tools
 
+VOLUME [ "/project" ]
+RUN git config --global --add safe.directory /project
+
+# Bundling project
 WORKDIR /project/
 ENTRYPOINT [ "./gradlew" ]
 
@@ -85,6 +88,30 @@ ENTRYPOINT [ \
 
 # Installs the APKs on an emulator
 FROM build AS emulate
+
+# Installing dependencies
+RUN \
+    apt-get install -y \
+        bridge-utils \
+        # kmod \
+        libvirt-clients \
+        libvirt-daemon-system \
+        qemu-kvm && \
+    apt-get clean
+
+# Used to qualify the type of Android Virtual Device (AVD) to emulate.
+#
+# ARM-based system images require the host platform to also be ARM-based.
+#
+# x86-based system images require KVM support, which requires
+# a kernel, something that WSL doesn't have and WSL2 doesn't include.
+# https://github.com/microsoft/WSL2-Linux-Kernel
+#
+ENV AVD_PACKAGE="system-images;android-35;google_apis;x86_64"
+
+RUN \
+    yes | sdkmanager "platform-tools" "emulator" "${AVD_PACKAGE}" && \
+    yes | sdkmanager --licenses
 
 WORKDIR /project/
 COPY [ "./docker/docker-entrypoint.sh", "/usr/local/bin/docker-entrypoint.sh" ]
