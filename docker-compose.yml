@@ -22,6 +22,20 @@ services:
       - type: 'bind'
         source: './app/build/outputs/'
         target: '/project/'
+  'sign':
+    build:
+      context: './reproducible-builds/'
+      dockerfile: './Dockerfile'
+      target: 'sign'
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: 'bind'
+        source: './app/build/outputs/apks/splits/'
+        target: '/project/'
+    secrets:
+      - source: 'keystore'
+        target: '/run/secrets/dev.keystore'
   'run':
     container_name: 'emulator'
     build:
@@ -40,3 +54,6 @@ services:
       - type: 'bind'
         source: './app/build/outputs/apks/splits/'
         target: '/project/'
+secrets:
+  'keystore':
+    file: './dev.keystore'
