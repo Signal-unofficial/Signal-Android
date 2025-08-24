@@ -1,5 +1,4 @@
 ARG BASE_IMAGE=ubuntu:jammy-20230624@sha256:b060fffe8e1561c9c3e6dea6db487b900100fc26830b9ea2ec966c151ab4c020
-ARG APK_ALIAS='Signal'
 
 # Base image with custom apt mirror
 FROM ${BASE_IMAGE} AS base
@@ -46,11 +45,10 @@ RUN \
 # Hack to put the SDK in the expected location
 WORKDIR ${ANDROID_HOME}/cmdline-tools
 RUN mv "./cmdline-tools" "./latest"
-ENV PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/emulator
+ENV PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin
 
-# Instaling dependencies
+# Installing dependencies
 RUN \
-    yes | sdkmanager --update && \
     yes | sdkmanager \
         "platforms;${ANDROID_API_LEVELS}" \
         "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
@@ -66,6 +64,8 @@ VOLUME [ "/project" ]
 RUN \
     git config --global --add safe.directory /project && \
     apt-get remove -y git
+
+ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}:${ANDROID_HOME}/emulator
 
 # Bundling project
 WORKDIR /project/
@@ -95,17 +95,11 @@ ENTRYPOINT [ \
     "--output=apks" \
 ]
 
-FROM base AS sign
-
-RUN \
-    apt-get update && \
-    apt-get install -y openjdk-17-jdk && \
-    apt-get clean
+FROM build AS sign
 
 COPY [ "./docker/sign-apks.sh", "/usr/local/bin/" ]
 
-ARG APK_ALIAS
-ENV APK_ALIAS=${APK_ALIAS}
+ENV APK_ALIAS='Signal'
 ENV KEYSTORE_FILE='/run/secrets/dev.keystore'
 
 WORKDIR /project/
@@ -145,8 +139,6 @@ ENV EMULATOR_PORT=5554
 EXPOSE ${EMULATOR_PORT} 8081
 
 ENV APKS='base-master.apk base-xxhdpi.apk base-x86_64.apk'
-ARG APK_ALIAS
-ENV APK_ALIAS=${APK_ALIAS}
 ENV EMULATOR_ARGS='-no-snapshot -no-passive-gps -no-location-ui -no-audio -no-boot-anim -netdelay none'
 
 # Args are sent to avdmanager to create the AVD to emulate

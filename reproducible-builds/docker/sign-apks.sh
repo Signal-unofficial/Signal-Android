@@ -12,13 +12,13 @@ getPassword() {
 }
 
 # Signs the given APK
-#
-# Syntax:
-# signApk <KEYSTORE_PASSWORD> <KEYSTORE_FILENAME> <APK_FILENAME> <APK_ALIAS>
 signApk() {
     PASSWORD=$1; shift
+    KEYSTORE=$1; shift
+    APK=$1; shift
+    ALIAS=$1; shift
 
-    echo "${PASSWORD}" | jarsigner -verbose -keystore "$@"
+    apksigner sign --pass-encoding utf-8 --ks-pass "pass:${PASSWORD}" --ks "${KEYSTORE}" --ks-key-alias "${ALIAS}" "${APK}"
 }
 
 # Signing APKs in the current directory
