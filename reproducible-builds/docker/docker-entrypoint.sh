@@ -37,5 +37,6 @@ echo 'INFO         | Installing APKs...'
 adb install-multiple -t ${APKS}
 
 # Blocking main process while emulator runs in background
+# (Ideally, we'd move the emulator to the foreground)
 echo 'INFO         | Ready!'
 tail -f '/dev/null'

@@ -67,6 +67,7 @@ Looking for documentation? Check out the wiki!
   need it in later steps. Note that in a production setting, this file would
   not be regenerated frequently, but rather reused until its expiry nears.
 - Run `docker-compose run -it --rm sign` to sign the APKs.
+  Feel free to backup the unsigned APKs in another folder.
 - Run `docker-compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
   (e.g, the `50000` in `50000:5554`), making it accessible in your browser
