@@ -70,7 +70,7 @@ Looking for documentation? Check out the wiki!
   Feel free to backup the unsigned APKs in another folder.
 - Run `docker-compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
-  (e.g, the `50000` in `50000:5554`), making it accessible in your browser
+  (e.g, the `50000` in `50000:8080`), making it accessible in your browser
   (i.e, `localhost:50000`).
 
 ## Legal things

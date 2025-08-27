@@ -1,29 +1,16 @@
 ARG BASE_IMAGE=ubuntu:jammy-20230624@sha256:b060fffe8e1561c9c3e6dea6db487b900100fc26830b9ea2ec966c151ab4c020
 
-# Base image with custom apt mirror
 FROM ${BASE_IMAGE} AS base
 
-WORKDIR /etc/apt/
-RUN [ "mv", "./sources.list", "./sources.list.old" ]
-COPY [ "./docker/apt.conf", "./docker/sources.list", "/etc/apt/" ]
-
-# Bit of a chicken-and-egg problem.
-# Ubuntu needs the ca-certificates package before it'll trust our mirror.
-# But we can't install it because it doesn't trust our mirror!
-# To resolve, we temporarily use the original source list.
-RUN \
-    apt-get update -o 'Dir::Etc::sourcelist=./sources.list.old' && \
-    apt-get install -o 'Dir::Etc::sourcelist=./sources.list.old' -y ca-certificates && \
-    # Back to normal, using our mirror.
-    apt-get clean
+COPY [ "./docker/apt.conf", "/etc/apt/" ]
 
 # Bundles the project
-FROM base AS build
+FROM ${BASE_IMAGE} AS build
 
 RUN \
-    apt-get update && \
-    apt-get install -y git openjdk-17-jdk unzip && \
-    apt-get clean
+    apt-get update -qq && \
+    apt-get install -yqq git openjdk-17-jdk unzip && \
+    apt-get clean -qq
 
 # Installing Android SDK
 ARG ANDROID_COMMAND_LINE_TOOLS_FILENAME=commandlinetools-linux-10406996_latest.zip
@@ -40,7 +27,7 @@ ADD --checksum=${ANDROID_COMMAND_LINE_TOOLS_HASH} \
 RUN \
     unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d "${ANDROID_HOME}/cmdline-tools" && \
     rm "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" && \
-    apt-get remove -y unzip
+    apt-get remove -yqq unzip
 
 # Hack to put the SDK in the expected location
 WORKDIR ${ANDROID_HOME}/cmdline-tools
@@ -63,7 +50,8 @@ RUN \
 VOLUME [ "/project" ]
 RUN \
     git config --global --add safe.directory /project && \
-    apt-get remove -y git
+    apt-get remove -yqq git && \
+    apt-get clean -qq
 
 ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}:${ANDROID_HOME}/emulator
 
@@ -108,40 +96,91 @@ ENTRYPOINT [ "/usr/local/bin/sign-apks.sh" ]
 # Installs the APKs on an emulator
 FROM build AS emulate
 
-# Installing dependencies
+WORKDIR /etc/apt/
 RUN \
-    apt-get install -y \
+    yes | sdkmanager "platform-tools" "emulator" && \
+    yes | sdkmanager --licenses && \
+    apt-get update -qq && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
         bridge-utils \
+        curl \
         libvirt-clients \
         libvirt-daemon-system \
-        qemu-kvm && \
-    apt-get clean
+        menu \
+        novnc \
+        openbox \
+        pulseaudio \
+        qemu-kvm \
+        x11vnc \
+        xvfb && \
+    apt-get clean -qq
 
 # Used to qualify the type of Android Virtual Device (AVD) to emulate.
 #
 # ARM-based system images require the host platform to also be ARM-based.
+# The same also applies to x86.
 #
-# x86-based system images require KVM support, which requires
-# a kernel, something that WSL doesn't have and WSL2 doesn't include.
-# https://github.com/microsoft/WSL2-Linux-Kernel
+# Due to the necessity of KVM support, WSL1 isn't supported because it imitates
+# a Linux kernel. Support would require either installing a real Linux kernel
+# or adding -no-accel to EMULATOR_ARGS.
 #
 ENV AVD_PACKAGE="system-images;android-35;google_apis;x86_64"
 
 RUN \
-    yes | sdkmanager "platform-tools" "emulator" "${AVD_PACKAGE}" && \
+    yes | sdkmanager "${AVD_PACKAGE}" && \
     yes | sdkmanager --licenses
 
 WORKDIR /project/
-COPY [ "./docker/docker-entrypoint.sh", "/usr/local/bin/docker-entrypoint.sh" ]
+COPY [ "./docker/console.sh", "./docker/docker-entrypoint.sh", "/usr/local/bin/" ]
 
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
-ENV EMULATOR_PORT=5554
-EXPOSE ${EMULATOR_PORT} 8081
 
-ENV APKS='base-master.apk base-xxhdpi.apk base-x86_64.apk'
-ENV EMULATOR_ARGS='-no-snapshot -no-passive-gps -no-location-ui -no-audio -no-boot-anim -netdelay none'
+ENV ANDROID_AVD_HOME='/root/.android/avd'
+ENV ANDROID_EMU_USE_SYSTEM_LIBS=1
 
-# Args are sent to avdmanager to create the AVD to emulate
-ENV ANDROID_AVD_HOME=/root/.android/avd
-ENV AVD_NAME=test-device
+# If set to ${ANDROID_AVD_HOME}, the AVDs will actually be
+# put in ${ANDROID_AVD_HOME}/.. instead for some reason
+ENV AVD_PATH="${ANDROID_AVD_HOME}/devices"
+ENV AVD_NAME='test-device'
+ENV DISPLAY=':0'
+ENV XVFB_ARGS=" \
+    ${DISPLAY} \
+    -screen 0 1280x720x24 \
+    "
+ARG X11VNC_PORT='5901'
+ENV X11VNC_ARGS=" \
+    -display "${DISPLAY}" \
+    -many \
+    -repeat \
+    -rfbport "${X11VNC_PORT}" \ 
+    -bg \
+    -noxdamage \
+    "
+ENV NOVNC_PORT='8080'
+ENV NOVNC_ARGS=" \
+    --vnc "localhost:${X11VNC_PORT}" \
+    --listen "${NOVNC_PORT}" \
+    "
+ENV ADB_PORT='5554'
+ENV EMULATOR_ARGS=" \
+    -avd "${AVD_NAME}" \
+    -no-qt \
+    -port "${ADB_PORT}" \
+    -gpu swiftshader_indirect \
+    -no-metrics \
+    -no-snapshot \
+    -no-boot-anim \
+    -netdelay none \
+    -no-audio \
+    -no-passive-gps \
+    -no-location-ui \
+    "
+ENV APKS=" \
+    base-master.apk \
+    base-xxhdpi.apk \
+    base-x86_64.apk \
+    "
 CMD [ "-d", "desktop_large" ]
+
+# ADB_PORT is only accessible on localhost
+EXPOSE "${NOVNC_PORT}"
