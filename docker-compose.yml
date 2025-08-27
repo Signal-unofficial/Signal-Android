@@ -48,8 +48,7 @@ services:
         target: '/dev/kvm'
         permissions: 'rw'
     ports:
-      - ':5554'
-      - ':8081'
+      - ':8080'
     volumes:
       - type: 'bind'
         source: './app/build/outputs/apks/splits/'
