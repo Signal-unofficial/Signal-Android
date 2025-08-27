@@ -12,11 +12,9 @@ RUN \
     apt-get install -yqq git openjdk-17-jdk unzip && \
     apt-get clean -qq
 
-# Installing Android SDK
-ARG ANDROID_COMMAND_LINE_TOOLS_FILENAME=commandlinetools-linux-10406996_latest.zip
-ARG ANDROID_COMMAND_LINE_TOOLS_HASH=sha256:8919e8752979db73d8321e9babe2caedcc393750817c1a5f56c128ec442fb540
-ARG ANDROID_API_LEVELS=android-35
-ARG ANDROID_BUILD_TOOLS_VERSION=35.0.0
+# Installing Android SDK 12.0
+ARG ANDROID_COMMAND_LINE_TOOLS_FILENAME=commandlinetools-linux-11076708_latest.zip
+ARG ANDROID_COMMAND_LINE_TOOLS_HASH=sha256:2d2d50857e4eb553af5a6dc3ad507a17adf43d115264b1afc116f95c92e5e258
 
 ENV ANDROID_HOME=/root/Android/Sdk
 
@@ -34,6 +32,9 @@ WORKDIR ${ANDROID_HOME}/cmdline-tools
 RUN mv "./cmdline-tools" "./latest"
 ENV PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin
 
+ARG ANDROID_API_LEVELS=android-35
+ARG ANDROID_BUILD_TOOLS_VERSION=35.0.0
+
 # Installing dependencies
 RUN \
     yes | sdkmanager \
@@ -43,7 +44,7 @@ RUN \
         "extras;android;m2repository" \
         "extras;google;google_play_services" \
         "ndk;28.0.13004108" \
-        "cmake;3.22.1"  && \
+        "cmake;3.22.1" && \
     yes | sdkmanager --licenses && \
     rm -rf ${ANDROID_HOME}/tools
 
