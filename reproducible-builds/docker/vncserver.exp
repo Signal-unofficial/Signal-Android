@@ -1,0 +1,23 @@
+#!/usr/bin/expect
+
+# Syntax:
+# expect vncserver.exp [PASSWFILE] [vncserver...]
+
+set PASSWFILE [lindex $argv 0]
+set PASSW [exec cat "$PASSWFILE"]
+set VNCSERVER_ARGS [lindex $argv 1];
+
+for {set i 1} {$i < [llength $VNCSERVER_ARGS]} {incr i} {
+    puts [lindex $VNCSERVER_ARGS $i]
+}
+
+# Runs VNC server with a password
+spawn vncserver $VNCSERVER_ARGS
+
+expect -exact "Password: "
+send -- "$PASSW\n"
+expect -exact "Verify:   "
+send -- "$PASSW\n"
+expect -exact "Would you like to enter a view-only password (y/n)? "
+send -- "n\n"
+expect eof

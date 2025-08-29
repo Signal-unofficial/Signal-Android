@@ -53,6 +53,7 @@
 *.ksh      text eol=lf
 *.sh       text eol=lf
 *.zsh      text eol=lf
+*.exp      text eol=lf
 # These are explicitly windows files and should use crlf
 *.bat      text eol=crlf
 *.cmd      text eol=crlf
@@ -133,6 +134,7 @@
 *.war           binary
 *.jks           binary
 *.ai            binary
+*.keystore      binary
 
 # Common build-tool wrapper scripts ('.cmd' versions are handled by 'Common.gitattributes')
 mvnw            text eol=lf
@@ -145,4 +147,6 @@ gradlew         text eol=lf
 **/.gitmodules    text eol=lf
 
 # Secrets
-*.pem          text
+*.pem          text eol=lf
+*.conf         text eol=lf
+*.conf.example text eol=lf

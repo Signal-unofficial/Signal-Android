@@ -1,0 +1,14 @@
+#!/usr/bin/expect
+
+# **Should only be used locally**
+# telnet sends plaintext, and is therefore insecure over a remote connection
+
+set timeout -1
+
+set PASSW [exec cat "/root/.emulator_console_auth_token"]
+
+# Spawns an Android console and authenticates
+spawn telnet localhost "$env(ADB_PORT)"
+expect -exact "Android Console: Authentication required"
+send -- "auth $PASSW\n"
+interact

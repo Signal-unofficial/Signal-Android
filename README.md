@@ -54,23 +54,24 @@ Looking for documentation? Check out the wiki!
 ## Building from Source
 
 - Install Docker Desktop
-- Install a Java JDK (at least version 17; JRE is not enough)
-- Run `docker-compose run -d --rm build` to create a `.aab` file.
+- Run `docker compose run -d --rm build` to create a `.aab` file.
   Note that from scratch, this operation takes about an hour
   (assuming great internet) and 16GB of RAM, so this would ideally be done
   on a device with more than 16GB of RAM, say, 32GB.
-- When the build completes, run `docker-compose run -d --rm package`
-  to create unsigned `.apk` files in `./app/build/outputs/apks/splits`.
+- When the build completes, run `docker compose run -d --rm package`
+  to create unsigned `.apk` files in [`splits`](./app/build/outputs/apks/splits).
   This operation is significantly faster.
 - Run `./gen-keystore` to generate the keys necessary for signing the APKs.
   Use a unique, secure password that you'll remember, as you'll
   need it in later steps. Note that in a production setting, this file would
   not be regenerated frequently, but rather reused until its expiry nears.
-- Run `docker-compose run -it --rm sign` to sign the APKs.
+- Remove the `.example` file extension from all [`secrets`](./reproducible-builds/secrets/)
+  and change the contents to make them your own, for security purposes.
+- Run `docker compose run -it --rm sign` to sign the APKs.
   Feel free to backup the unsigned APKs in another folder.
-- Run `docker-compose up -d run` to run an emulator with the APKs installed.
+- Run `docker compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
-  (e.g, the `50000` in `50000:8080`), making it accessible in your browser
+  (e.g, the `50000` in `50000:5900`), making it accessible in your browser
   (i.e, `localhost:50000`).
 
 ## Legal things

@@ -104,16 +104,16 @@ RUN \
     apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
         bridge-utils \
-        curl \
+        expect \
+        gnome-core \
         libvirt-clients \
         libvirt-daemon-system \
-        menu \
-        novnc \
-        openbox \
         pulseaudio \
         qemu-kvm \
-        x11vnc \
-        xvfb && \
+        telnet \
+        tightvncserver \
+        xfce4 \
+        xfonts-base && \
     apt-get clean -qq
 
 # Used to qualify the type of Android Virtual Device (AVD) to emulate.
@@ -132,44 +132,54 @@ RUN \
     yes | sdkmanager --licenses
 
 WORKDIR /project/
-COPY [ "./docker/console.sh", "./docker/docker-entrypoint.sh", "/usr/local/bin/" ]
+COPY [ \
+    "./docker/docker-entrypoint.sh", \
+    "./docker/vncserver.exp", \
+    "./docker/console.exp", \
+    "/usr/local/bin/" \
+]
+
+RUN [ "chmod", "+x", "/usr/local/bin/vncserver.exp" ]
 
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
-ENV ANDROID_AVD_HOME='/root/.android/avd'
 ENV ANDROID_EMU_USE_SYSTEM_LIBS=1
-
+ENV USER='root'
+ENV HOME="/${USER}"
+ARG DISPLAY_INDEX=':0'
+ENV DISPLAY="${DISPLAY_INDEX}.0"
+ENV XRDB_ARGS=" \
+    ${HOME}/.Xresources \
+    xsetroot \
+    -solid grey \
+    vncconfig \
+    -iconic \
+    "
+ENV VNCSERVER_PASSWORDFILE='/run/secrets/vnc_passwd.conf'
+ARG VNC_PORT='5900'
+ENV VNCSERVER_ARGS=" \
+    "${DISPLAY_INDEX}" \
+    -httpport "${VNC_PORT}" \
+    -geometry 1080x1920 \
+    -depth 24 \
+    # nologo \
+    "
+ENV ANDROID_AVD_HOME="${HOME}/.android/avd"
 # If set to ${ANDROID_AVD_HOME}, the AVDs will actually be
 # put in ${ANDROID_AVD_HOME}/.. instead for some reason
 ENV AVD_PATH="${ANDROID_AVD_HOME}/devices"
 ENV AVD_NAME='test-device'
-ENV DISPLAY=':0'
-ENV XVFB_ARGS=" \
-    ${DISPLAY} \
-    -screen 0 1280x720x24 \
-    "
-ARG X11VNC_PORT='5901'
-ENV X11VNC_ARGS=" \
-    -display "${DISPLAY}" \
-    -many \
-    -repeat \
-    -rfbport "${X11VNC_PORT}" \ 
-    -bg \
-    -noxdamage \
-    "
-ENV NOVNC_PORT='8080'
-ENV NOVNC_ARGS=" \
-    --vnc "localhost:${X11VNC_PORT}" \
-    --listen "${NOVNC_PORT}" \
-    "
 ENV ADB_PORT='5554'
 ENV EMULATOR_ARGS=" \
+    # Required:
     -avd "${AVD_NAME}" \
-    -no-qt \
     -port "${ADB_PORT}" \
+    -no-qt \
     -gpu swiftshader_indirect \
+    # Configurable:
     -no-metrics \
     -no-snapshot \
+    -wipe-data \
     -no-boot-anim \
     -netdelay none \
     -no-audio \
@@ -181,7 +191,11 @@ ENV APKS=" \
     base-xxhdpi.apk \
     base-x86_64.apk \
     "
-CMD [ "-d", "desktop_large" ]
+# avdmanager args
+CMD [ \
+    "-f", \
+    "-d", "desktop_large" \
+]
 
 # ADB_PORT is only accessible on localhost
-EXPOSE "${NOVNC_PORT}"
+EXPOSE "${VNC_PORT}"

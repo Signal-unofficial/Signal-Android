@@ -34,8 +34,8 @@ services:
         source: './app/build/outputs/apks/splits/'
         target: '/project/'
     secrets:
-      - source: 'keystore'
-        target: '/run/secrets/dev.keystore'
+      - source: 'all'
+        target: '/run/secrets/'
   'run':
     container_name: 'emulator'
     build:
@@ -48,11 +48,14 @@ services:
         target: '/dev/kvm'
         permissions: 'rw'
     ports:
-      - ':8080'
+      - ':5900'
     volumes:
       - type: 'bind'
         source: './app/build/outputs/apks/splits/'
         target: '/project/'
+    secrets:
+      - source: 'all'
+        target: '/run/secrets/'
 secrets:
-  'keystore':
-    file: './dev.keystore'
+  'all':
+    file: './reproducible-builds/secrets/'
