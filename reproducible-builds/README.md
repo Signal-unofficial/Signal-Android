@@ -74,7 +74,7 @@ This may take a while depending on your network connection and CPU.
 
 ```bash
 # Build the app
-docker-compose up -d build
+docker compose up -d build
 ```
 
 After that's done, you have your app bundle! It's located in `app/build/outputs/bundle/playProdRelease`. Let's copy it into the directory we set up in the first step:
