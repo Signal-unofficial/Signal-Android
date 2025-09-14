@@ -1,0 +1,13 @@
+# Configuration file format:
+# https://github.com/NetrisTV/ws-scrcpy/blob/master/src/types/Configuration.d.ts
+
+# HTTP server configuration
+server:
+  - secure: false
+    port: 8000
+
+# Announce remote device trackers. The server doesn't check their availability.
+remoteHostList:
+  - useProxy: false # Optional, default: false
+    type: android
+    secure: false

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(dirname "$0")"
-
 # Creating virtual machine
 echo '===== Creating virtual device ====='
 # shellcheck disable=SC2068 # Expanding $@ is intentional
@@ -29,19 +27,13 @@ echo '===== Installing APKs ====='
 # shellcheck disable=SC2086 # Expanding APKS is intentional
 adb install-multiple -t ${APKS} &
 
-# Exposing emulator to the host
-# https://stackoverflow.com/a/57651203
-echo '===== Starting VNC server ====='
-unset SESSION_MANAGER
-unset DBUS_SESSION_BUS_ADDRESS
-startxfce4 &
-# shellcheck disable=SC2086 # Expanding XRDB_ARGS is intentional
-[ -x /etc/vnc/xstartup ] \
-    && exec /etc/vnc/xstartup [ -r "${HOME}/.Xresources" ] \
-    && xrdb ${XRDB_ARGS} &
-mkdir -p "${HOME}/.vnc"
-# shellcheck disable=SC2086 # Expanding VNCSERVER_ARGS is intentional
-expect "${SCRIPT_DIR}/vncserver.exp" "${VNCSERVER_PASSWORDFILE}" "${VNCSERVER_ARGS[@]}"
+# Running VNC-like web server
+echo '===== Running web server ====='
+cd "/usr/ws-scrcpy/dist/" || {
+    echo 'ws-scrcpy not installed correctly'
+    exit
+}
+npm start
 
-echo '===== Done ====='
+echo '===== Ready ====='
 tail -f '/dev/null'
