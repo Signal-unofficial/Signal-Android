@@ -156,12 +156,13 @@ ENV ANDROID_AVD_HOME="${HOME}/.android/avd"
 # put in ${ANDROID_AVD_HOME}/.. instead for some reason
 ENV AVD_PATH="${ANDROID_AVD_HOME}/devices"
 ENV AVD_NAME='test-device'
-ENV ADB_PORT='5554'
+ENV ADB_SHELL_PORT='5554'
+ENV ADB_PORT='5037'
 ENV WS_SCRCPY_CONFIG='/usr/local/bin/ws_scrcpy_config.yaml'
 ENV EMULATOR_ARGS=" \
     # Required:
     -avd "${AVD_NAME}" \
-    -port "${ADB_PORT}" \
+    -port "${EMULATOR_ADB_PORT}" \
     -no-qt \
     -gpu auto \
     -accel on \
