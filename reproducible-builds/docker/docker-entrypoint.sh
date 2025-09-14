@@ -22,6 +22,10 @@ until [ "$(adb shell getprop sys.boot_completed)" = 1 ]; do
     sleep 1
 done
 
+# Enabling USB debugging
+adb shell settings put global development_settings_enabled 1
+adb shell settings put global adb_enabled 1
+
 # Installing APKs
 echo '===== Installing APKs ====='
 # shellcheck disable=SC2086 # Expanding APKS is intentional
@@ -34,6 +38,3 @@ cd "/usr/ws-scrcpy/dist/" || {
     exit
 }
 npm start
-
-echo '===== Ready ====='
-tail -f '/dev/null'

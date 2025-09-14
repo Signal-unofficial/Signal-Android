@@ -99,7 +99,7 @@ WORKDIR /project/
 ENTRYPOINT [ "/usr/local/bin/sign-apks.sh" ]
 
 # Installs the APKs on an emulator
-FROM build AS emulate
+FROM ws_scrcpy AS emulate
 
 ENV PATH=${PATH}:${ANDROID_HOME}/emulator
 
@@ -147,6 +147,7 @@ COPY --chmod="+x" [ \
 ]
 
 # Should be updated if we use the USER instruction
+# Additional requirements: https://github.com/DeviceFarmer/adbkit?tab=readme-ov-file#requirements
 ENV USER='root'
 ENV HOME="/${USER}"
 ENV ANDROID_EMU_USE_SYSTEM_LIBS=1
@@ -192,4 +193,4 @@ CMD [ \
 # For security warnings, see:
 # https://github.com/Vessel9817/ws-scrcpy/tree/signal-android?tab=readme-ov-file#security-warning
 WORKDIR /project/
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
+ENTRYPOINT [ "bash", "-c", "source \"${NVM_DIR}/nvm.sh\" && exec '/usr/local/bin/docker-entrypoint.sh' \"$@\"", "--" ]

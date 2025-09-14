@@ -1,6 +1,13 @@
-include:
-  - './reproducible-builds/ws-scrcpy/docker-compose.yml'
 services:
+  'ws-scrcpy-with-adb':
+    extends:
+      file: './reproducible-builds/ws-scrcpy/docker-compose.yml'
+      service: 'ws-scrcpy'
+    build:
+      additional_contexts:
+        'base': 'service:build'
+      args:
+        - 'BASE_IMAGE=base'
   'build':
     container_name: 'bundler'
     build:
@@ -44,6 +51,8 @@ services:
       context: './reproducible-builds/'
       dockerfile: './Dockerfile'
       target: 'emulate'
+      additional_contexts:
+        'ws_scrcpy': 'service:ws-scrcpy-with-adb'
     gpus: 'all'
     devices:
       - source: '/dev/kvm' # Even works with WSL2 (not WSL1)
