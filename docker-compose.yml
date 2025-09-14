@@ -1,3 +1,5 @@
+include:
+  - './reproducible-builds/ws-scrcpy/docker-compose.yml'
 services:
   'build':
     container_name: 'bundler'
@@ -48,7 +50,7 @@ services:
         target: '/dev/kvm'
         permissions: 'rw'
     ports:
-      - ':5900'
+      - ':8000'
     volumes:
       - type: 'bind'
         source: './app/build/outputs/apks/splits/'

@@ -54,10 +54,9 @@ Looking for documentation? Check out the wiki!
 ## Building from Source
 
 - Install Docker Desktop
-- Run `docker compose run -d --rm build` to create a `.aab` file.
-  Note that from scratch, this operation takes about an hour
-  (assuming great internet) and 16GB of RAM, so this would ideally be done
-  on a device with more than 16GB of RAM, say, 32GB.
+- Run `docker compose run -d --rm build` to create an `.aab` bundle.
+  Note that when building from scratch,
+  this operation takes at least an hour and 15GB of container memory.
 - When the build completes, run `docker compose run -d --rm package`
   to create unsigned `.apk` files in [`splits`](./app/build/outputs/apks/splits).
   This operation is significantly faster.
@@ -71,7 +70,7 @@ Looking for documentation? Check out the wiki!
   Feel free to backup the unsigned APKs in another folder.
 - Run `docker compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
-  (e.g, the `50000` in `50000:5900`), making it accessible in your browser
+  (e.g, the `50000` in `50000:8000`), making it accessible in your browser
   (i.e, `localhost:50000`).
 
 ## Legal things

@@ -5,12 +5,15 @@ FROM ${BASE_IMAGE} AS base
 COPY [ "./docker/apt.conf", "/etc/apt/" ]
 
 # Bundles the project
-FROM ${BASE_IMAGE} AS build
+FROM base AS build
 
 RUN \
-    apt-get update -qq && \
-    apt-get install -yqq git openjdk-17-jdk unzip && \
-    apt-get clean -qq
+    apt-get update -qq \
+    && apt-get install -yqq \
+        git \
+        openjdk-17-jdk \
+        unzip \
+    && apt-get clean -qq
 
 # Installing Android SDK 12.0
 ARG ANDROID_COMMAND_LINE_TOOLS_FILENAME=commandlinetools-linux-11076708_latest.zip
@@ -23,9 +26,9 @@ ADD --checksum=${ANDROID_COMMAND_LINE_TOOLS_HASH} \
     "https://dl.google.com/android/repository/${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" \
     './'
 RUN \
-    unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d "${ANDROID_HOME}/cmdline-tools" && \
-    rm "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" && \
-    apt-get remove -yqq unzip
+    unzip "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" -d "${ANDROID_HOME}/cmdline-tools" \
+    && rm "./${ANDROID_COMMAND_LINE_TOOLS_FILENAME}" \
+    && apt-get remove -yqq unzip
 
 # Hack to put the SDK in the expected location
 WORKDIR ${ANDROID_HOME}/cmdline-tools
@@ -44,17 +47,17 @@ RUN \
         "extras;android;m2repository" \
         "extras;google;google_play_services" \
         "ndk;28.0.13004108" \
-        "cmake;3.22.1" && \
-    yes | sdkmanager --licenses && \
-    rm -rf ${ANDROID_HOME}/tools
+        "cmake;3.22.1" \
+    && yes | sdkmanager --licenses \
+    && rm -rf ${ANDROID_HOME}/tools
 
 VOLUME [ "/project" ]
 RUN \
-    git config --global --add safe.directory /project && \
-    apt-get remove -yqq git && \
-    apt-get clean -qq
+    git config --global --add safe.directory /project \
+    && apt-get remove -yqq git \
+    && apt-get clean -qq
 
-ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}:${ANDROID_HOME}/emulator
+ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}
 
 # Bundling project
 WORKDIR /project/
@@ -84,6 +87,7 @@ ENTRYPOINT [ \
     "--output=apks" \
 ]
 
+# Signs all files (presumably unsigned APKs) in the workdir
 FROM build AS sign
 
 COPY [ "./docker/sign-apks.sh", "/usr/local/bin/" ]
@@ -97,24 +101,27 @@ ENTRYPOINT [ "/usr/local/bin/sign-apks.sh" ]
 # Installs the APKs on an emulator
 FROM build AS emulate
 
-WORKDIR /etc/apt/
+ENV PATH=${PATH}:${ANDROID_HOME}/emulator
+
 RUN \
-    yes | sdkmanager "platform-tools" "emulator" && \
-    yes | sdkmanager --licenses && \
-    apt-get update -qq && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+    yes | sdkmanager "platform-tools" "emulator" \
+    && yes | sdkmanager --licenses \
+    && apt-get update -qq \
+    # Interactive dependencies
+    && DEBIAN_FRONTEND=noninteractive apt-get install -yqq \
+        tzdata \
+    # Emulator utilities
+    && apt-get install -yqq \
         bridge-utils \
-        expect \
-        gnome-core \
         libvirt-clients \
         libvirt-daemon-system \
         pulseaudio \
         qemu-kvm \
+    # Console
+    && apt-get install -yqq \
+        expect \
         telnet \
-        tightvncserver \
-        xfce4 \
-        xfonts-base && \
-    apt-get clean -qq
+    && apt-get clean -qq
 
 # Used to qualify the type of Android Virtual Device (AVD) to emulate.
 #
@@ -123,59 +130,40 @@ RUN \
 #
 # Due to the necessity of KVM support, WSL1 isn't supported because it imitates
 # a Linux kernel. Support would require either installing a real Linux kernel
-# or adding -no-accel to EMULATOR_ARGS.
+# or adding -no-accel to EMULATOR_ARGS, the latter of which may not work.
 #
 ENV AVD_PACKAGE="system-images;android-35;google_apis;x86_64"
 
 RUN \
-    yes | sdkmanager "${AVD_PACKAGE}" && \
-    yes | sdkmanager --licenses
+    yes | sdkmanager "${AVD_PACKAGE}" \
+    && yes | sdkmanager --licenses
 
-WORKDIR /project/
-COPY [ \
+WORKDIR /usr/local/bin/
+COPY [ "./docker/ws_scrcpy_config.yaml", "./" ]
+COPY --chmod="+x" [ \
     "./docker/docker-entrypoint.sh", \
-    "./docker/vncserver.exp", \
     "./docker/console.exp", \
-    "/usr/local/bin/" \
+    "./" \
 ]
 
-RUN [ "chmod", "+x", "/usr/local/bin/vncserver.exp" ]
-
-ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
-
-ENV ANDROID_EMU_USE_SYSTEM_LIBS=1
+# Should be updated if we use the USER instruction
 ENV USER='root'
 ENV HOME="/${USER}"
-ARG DISPLAY_INDEX=':0'
-ENV DISPLAY="${DISPLAY_INDEX}.0"
-ENV XRDB_ARGS=" \
-    ${HOME}/.Xresources \
-    xsetroot \
-    -solid grey \
-    vncconfig \
-    -iconic \
-    "
-ENV VNCSERVER_PASSWORDFILE='/run/secrets/vnc_passwd.conf'
-ARG VNC_PORT='5900'
-ENV VNCSERVER_ARGS=" \
-    "${DISPLAY_INDEX}" \
-    -httpport "${VNC_PORT}" \
-    -geometry 1080x1920 \
-    -depth 24 \
-    # nologo \
-    "
+ENV ANDROID_EMU_USE_SYSTEM_LIBS=1
 ENV ANDROID_AVD_HOME="${HOME}/.android/avd"
 # If set to ${ANDROID_AVD_HOME}, the AVDs will actually be
 # put in ${ANDROID_AVD_HOME}/.. instead for some reason
 ENV AVD_PATH="${ANDROID_AVD_HOME}/devices"
 ENV AVD_NAME='test-device'
 ENV ADB_PORT='5554'
+ENV WS_SCRCPY_CONFIG='/usr/local/bin/ws_scrcpy_config.yaml'
 ENV EMULATOR_ARGS=" \
     # Required:
     -avd "${AVD_NAME}" \
     -port "${ADB_PORT}" \
     -no-qt \
-    -gpu swiftshader_indirect \
+    -gpu auto \
+    -accel on \
     # Configurable:
     -no-metrics \
     -no-snapshot \
@@ -185,6 +173,7 @@ ENV EMULATOR_ARGS=" \
     -no-audio \
     -no-passive-gps \
     -no-location-ui \
+    -camera-back none \
     "
 ENV APKS=" \
     base-master.apk \
@@ -197,5 +186,10 @@ CMD [ \
     "-d", "desktop_large" \
 ]
 
-# ADB_PORT is only accessible on localhost
-EXPOSE "${VNC_PORT}"
+# For browser and AVD requirements, see:
+# https://github.com/Vessel9817/ws-scrcpy/tree/signal-android?tab=readme-ov-file#requirements
+#
+# For security warnings, see:
+# https://github.com/Vessel9817/ws-scrcpy/tree/signal-android?tab=readme-ov-file#security-warning
+WORKDIR /project/
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]

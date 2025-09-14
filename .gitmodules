@@ -1,0 +1,4 @@
+[submodule "reproducible-builds/ws-scrcpy"]
+	path = reproducible-builds/ws-scrcpy
+	url = https://github.com/Vessel9817/ws-scrcpy
+	branch = signal-android
