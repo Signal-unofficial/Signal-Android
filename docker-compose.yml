@@ -63,10 +63,7 @@ services:
     volumes:
       - type: 'bind'
         source: './app/build/outputs/apks/splits/'
-        target: '/project/'
-    secrets:
-      - source: 'all'
-        target: '/run/secrets/'
+        target: '/project'
 secrets:
   'all':
     file: './reproducible-builds/secrets/'
