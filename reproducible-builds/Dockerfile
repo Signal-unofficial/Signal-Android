@@ -162,7 +162,7 @@ ENV WS_SCRCPY_CONFIG='/usr/local/bin/ws_scrcpy_config.yaml'
 ENV EMULATOR_ARGS=" \
     # Required:
     -avd "${AVD_NAME}" \
-    -port "${EMULATOR_ADB_PORT}" \
+    -port "${ADB_SHELL_PORT}" \
     -no-qt \
     -gpu auto \
     -accel on \
