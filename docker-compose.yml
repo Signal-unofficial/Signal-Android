@@ -20,9 +20,6 @@ services:
         target: '/project/'
   'package':
     container_name: 'packager'
-    # depends_on:
-    #   'build':
-    #     condition: 'service_completed_successfully'
     build:
       context: './reproducible-builds/'
       dockerfile: './Dockerfile'

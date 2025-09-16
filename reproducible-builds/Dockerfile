@@ -52,10 +52,7 @@ RUN \
     && rm -rf ${ANDROID_HOME}/tools
 
 VOLUME [ "/project" ]
-RUN \
-    git config --global --add safe.directory /project \
-    && apt-get remove -yqq git \
-    && apt-get clean -qq
+RUN git config --global --add safe.directory /project
 
 ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}
 
