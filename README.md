@@ -51,12 +51,25 @@ Looking for documentation? Check out the wiki!
 
 [https://github.com/signalapp/Signal-Android/wiki]
 
-## Building from Source
+## Building From Source
 
 - Install Docker Desktop
 - Run `docker compose run -d --rm build` to create an `.aab` bundle.
   Note that when building from scratch,
-  this operation takes at least an hour and 15GB of container memory.
+  this operation takes at least an hour and 15GB of memory.
+  - If your PC doesn't have at least 15GB of RAM (double recommended,
+    since your host needs memory, too), then this cannot be done.
+    Instead, you'll need to perform a manual installation. Good luck.
+    You will need to install:
+    - Git
+    - Java 17+
+    - Android SDK 12.0+ (or the much larger Android Studio app that includes it)
+    The `build` stage of the relevant [Dockerfile](./Dockerfile) contains steps
+    for installing these tools on Ubuntu 24.04 (Noble), as well as running the build itself.
+    If ever this information is incorrect or outdated, see the Dockerfile instead.
+  - If your PC does meet this memory requirement, but Docker doesn't use
+    that much memory (defaults to 50% of the maximum host memory), see:
+    [raising the Docker memory limit](https://docs.docker.com/desktop/settings-and-maintenance/settings/#advanced).
 - When the build completes, run `docker compose run -d --rm package`
   to create unsigned `.apk` files in [`splits`](./app/build/outputs/apks/splits).
   This operation is significantly faster.
@@ -66,7 +79,7 @@ Looking for documentation? Check out the wiki!
   not be regenerated frequently, but rather reused until its expiry nears.
 - Remove the `.example` file extension from all [`secrets`](./reproducible-builds/secrets/)
   and change the contents to make them your own, for security purposes.
-- Run `docker compose run -it --rm sign` to sign the APKs.
+- Run `docker compose run -it --rm sign` to sign the APKs through the console.
   Feel free to backup the unsigned APKs in another folder.
 - Run `docker compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port

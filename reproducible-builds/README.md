@@ -8,6 +8,12 @@ The command-line instructions in this guide are written for Linux, but you can a
 
 In the following sections, we will use Signal version `7.7.0` as the reference example. Simply replace all occurrences of `7.7.0` with the version number you are about to verify.
 
+## Just compiling or running the project
+
+If you're not interested in verifying that an APK was built from this source,
+we have a condensed instruction set in the project README, under the section
+[Building From Source](/README.md#building-from-source).
+
 ## Overview of the process
 
 Completing the reproducible build process verifies that the code in our public repository is exactly the same code that's running on your device.
@@ -230,10 +236,13 @@ bundletool check-transparency \
 
 (For other ways of verifying the code transparency fingerprint, you can check out the [official guide](https://developer.android.com/guide/app-bundle/code-transparency#verify_apk) on the Android Developers site.)
 
-The command above will output the code transparency results, including a certificate fingerprint. You can verify that this matches the code transparency fingerprint:
+The command above will output the code transparency results, including a certificate fingerprint. You can verify that this matches the code transparency fingerprint of the official Signal repository:
 
 ```txt
 57 24 B1 15 23 8C 7B 03 E2 6A D9 01 34 FC 77 C5 7B 69 E7 ED DE 3B 70 C2 A7 8E C7 A5 58 3E FC 8E
 ```
+
+For any fork of the repository, such as this, they will have their own
+certificate fingerprint.
 
 Thanks for using (and reproducibly building) Signal!
