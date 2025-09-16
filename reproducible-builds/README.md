@@ -74,7 +74,7 @@ This may take a while depending on your network connection and CPU.
 
 ```bash
 # Build the app
-docker compose up -d build
+docker compose up -d build bundlePlayProdRelease
 ```
 
 After that's done, you have your app bundle! It's located in `app/build/outputs/bundle/playProdRelease`. Let's copy it into the directory we set up in the first step:
@@ -189,7 +189,7 @@ This actually ends up making things a bit easier because you will only have one 
 
 ```bash
 # Make website build (output to app/build/outputs/apk/websiteProdRelease)
-docker run --rm -v "$(pwd)":/project -w /project --user "$(id -u):$(id -g)" signal-android ./gradlew assembleWebsiteProdRelease
+docker compose up -d build assembleWebsiteProdRelease
 ```
 
 Otherwise, all of the steps above will still apply, and you will only need to compare the APK you downloaded from the website (or pulled from your device) with the one you built above.
