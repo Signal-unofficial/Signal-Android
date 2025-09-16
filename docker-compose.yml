@@ -5,9 +5,9 @@ services:
       service: 'ws-scrcpy'
     build:
       additional_contexts:
-        'base': 'service:build'
+        'new_base': 'service:build'
       args:
-        - 'BASE_IMAGE=base'
+        - 'BASE_IMAGE=new_base'
   'build':
     container_name: 'bundler'
     build:
