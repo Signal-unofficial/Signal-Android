@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Retrieves and returns the keystore password from the user
 # https://stackoverflow.com/a/3980713
@@ -18,14 +18,19 @@ signApk() {
     APK=$1; shift
     ALIAS=$1; shift
 
-    apksigner sign --pass-encoding utf-8 --ks-pass "pass:${PASSWORD}" --ks "${KEYSTORE}" --ks-key-alias "${ALIAS}" "${APK}"
+    apksigner sign \
+        --pass-encoding utf-8 \
+        --ks-pass "pass:${PASSWORD}" \
+        --ks "${KEYSTORE}" \
+        --ks-key-alias "${ALIAS}" \
+        "${APK}"
 }
 
 # Signing APKs in the current directory
 KEYSTORE_PASSWORD="$(getPassword)"
 
 for FILE in *; do 
-    if [ -f "${FILE}" ]; then 
+    if [ -f "${FILE}" ] && [ "${FILE: -4}" = '.apk' ]; then 
         echo "Signing ${FILE}" 
         signApk "${KEYSTORE_PASSWORD}" "${KEYSTORE_FILE}" "${FILE}" "${APK_ALIAS}"
     fi 
