@@ -37,7 +37,8 @@ services:
     tty: true
     volumes:
       - type: 'bind'
-        source: './app/build/outputs/apks/splits/'
+        # source: './app/build/outputs/apks/splits/'
+        source: './app/build/outputs/apk/websiteProd/release/'
         target: '/project/'
     secrets:
       - source: 'all'
@@ -59,7 +60,8 @@ services:
       - ':8000'
     volumes:
       - type: 'bind'
-        source: './app/build/outputs/apks/splits/'
+        # source: './app/build/outputs/apks/splits/'
+        source: './app/build/outputs/apk/websiteProd/release/'
         target: '/project'
 secrets:
   'all':

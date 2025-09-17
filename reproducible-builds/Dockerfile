@@ -1,4 +1,6 @@
-ARG BASE_IMAGE=ubuntu:jammy-20230624@sha256:b060fffe8e1561c9c3e6dea6db487b900100fc26830b9ea2ec966c151ab4c020
+# Ubuntu Noble standard support reaches EOL in April 2029
+# https://ubuntu.com/about/release-cycle
+ARG BASE_IMAGE=ubuntu:noble-20250910@sha256:985be7c735afdf6f18aaa122c23f87d989c30bba4e9aa24c8278912aac339a8d
 
 FROM ${BASE_IMAGE} AS base
 
@@ -60,13 +62,13 @@ ENV PATH=${PATH}:${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS_VERSION}
 WORKDIR /project/
 ENTRYPOINT [ "./gradlew" ]
 
-# OS-specific bundle (smaller)
-CMD [ "bundlePlayProdRelease" ]
+# Split bundle (smaller)
+# CMD [ "bundlePlayProdRelease" ]
 
 # Universal bundle (larger)
-# CMD [ "assembleWebsiteProdRelease" ]
+CMD [ "assembleWebsiteProdRelease" ]
 
-# Packages the bundle into APKs
+# Packages the bundle into APKs (split bundle only)
 FROM build AS package
 
 ARG BUNDLETOOL_VERSION=1.18.1
@@ -76,10 +78,13 @@ ADD --checksum=${BUNDLETOOL_HASH} \
     '/usr/local/bin/bundletool.jar'
 
 WORKDIR /project/
-ENTRYPOINT [ \
-    "java", "-jar", "/usr/local/bin/bundletool.jar", \
-    "build-apks", \
-    "--bundle=./bundle/playProdRelease/Signal-Android-play-prod-release.aab", \
+ENTRYPOINT [ "java", "-jar", "/usr/local/bin/bundletool.jar", "build-apks" ]
+
+# Split bundle
+ARG BUNDLE_PATH="./bundle/playProdRelease/Signal-Android-play-prod-release.aab"
+
+CMD [ \
+    "--bundle=\"${BUNDLE_PATH}\"", \
     "--output-format=DIRECTORY", \
     "--output=apks" \
 ]
@@ -174,11 +179,20 @@ ENV EMULATOR_ARGS=" \
     -no-location-ui \
     -camera-back none \
     "
-ENV APKS=" \
-    base-master.apk \
-    base-xxhdpi.apk \
-    base-x86_64.apk \
-    "
+
+# Universal bundle
+# Note: Even though the file name includes "unsigned," this should be signed.
+# The signing process doesn't change the file name, which is generated
+# by the build step.
+ENV APKS="Signal-Android-website-prod-x86_64-release-unsigned-7.52.2.apk"
+
+# Split bundle
+# ENV APKS=" \
+#     base-master.apk \
+#     base-xxhdpi.apk \
+#     base-x86_64.apk \
+#     "
+
 # avdmanager args
 CMD [ \
     "-f", \
