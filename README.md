@@ -14,7 +14,7 @@ Currently available on the Play Store and [signal.org](https://signal.org/androi
 
 We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
-[https://github.com/signalapp/Signal-Android/issues]
+[https://github.com/Vessel9817/Signal-Android/issues]
 
 ## Joining the Beta
 
@@ -23,17 +23,25 @@ Want to live life on the bleeding edge and help out with testing?
 You can subscribe to Signal Android Beta releases here:
 [https://play.google.com/apps/testing/org.thoughtcrime.securesms]
 
-If you're interested in a life of peace and tranquility, stick with the standard releases.
+If you're interested in a life of peace and tranquility,
+stick with the standard releases.
 
 ## Contributing Code
 
-If you're new to the Signal codebase, we recommend going through our issues and picking out a simple bug to fix in order to get yourself familiar. Also please have a look at the [CONTRIBUTING.md](https://github.com/signalapp/Signal-Android/blob/main/CONTRIBUTING.md), that might answer some of your questions.
+If you're new to the Signal codebase, we recommend going through our issues
+and picking out a simple bug to fix in order to get yourself familiar.
+Also please have a look at the [CONTRIBUTING.md](./CONTRIBUTING.md),
+that might answer some of your questions.
 
-For larger changes and feature ideas, we ask that you propose it on the [unofficial Community Forum](https://community.signalusers.org) for a high-level discussion with the wider community before implementation.
+For larger changes and feature ideas, we ask that you propose it on the
+[unofficial Community Forum](https://community.signalusers.org)
+for a high-level discussion with the wider community before implementation.
 
 ## Contributing Ideas
 
-Have something you want to say about Signal projects or want to be part of the conversation? Get involved in the [community forum](https://community.signalusers.org).
+Have something you want to say about Signal projects or want to be part of
+the conversation? Get involved in the
+[community forum](https://community.signalusers.org).
 
 Help
 
@@ -49,12 +57,15 @@ For troubleshooting and questions, please visit our support center!
 
 Looking for documentation? Check out the wiki!
 
-[https://github.com/signalapp/Signal-Android/wiki]
+[https://github.com/Vessel9817/Signal-Android/wiki]
 
 ## Building From Source
 
 - Install Docker Desktop
-- Run `docker compose run -d --rm build` to create an `.aab` bundle.
+- Run `docker compose run -d --rm build <BUILD_TYPE>`, where `<BUILD_TYPE>`
+  is `bundlePlayProdRelease` (split build) or `assembleWebsiteProdRelease`
+  (universal build). If omitted, defaults to `assembleWebsiteProdRelease`.
+  bundle. If you build the universal bundle
   Note that when building from scratch,
   this operation takes at least an hour and 15GB of memory.
   - If your PC doesn't have at least 15GB of RAM (double recommended,
@@ -70,21 +81,30 @@ Looking for documentation? Check out the wiki!
   - If your PC does meet this memory requirement, but Docker doesn't use
     that much memory (defaults to 50% of the maximum host memory), see:
     [raising the Docker memory limit](https://docs.docker.com/desktop/settings-and-maintenance/settings/#advanced).
-- When the build completes, run `docker compose run -d --rm package`
+- If you've built a universal bundle, skip this step, as the APKs are already made.
+  When the build completes, run `docker compose run -d --rm package`
   to create unsigned `.apk` files in [`splits`](./app/build/outputs/apks/splits).
   This operation is significantly faster.
 - Run `./gen-keystore` to generate the keys necessary for signing the APKs.
   Use a unique, secure password that you'll remember, as you'll
   need it in later steps. Note that in a production setting, this file would
   not be regenerated frequently, but rather reused until its expiry nears.
-- Remove the `.example` file extension from all [`secrets`](./reproducible-builds/secrets/)
-  and change the contents to make them your own, for security purposes.
 - Run `docker compose run -it --rm sign` to sign the APKs through the console.
-  Feel free to backup the unsigned APKs in another folder.
+  Feel free to backup the unsigned APKs in another folder beforehand.
+  Make sure the source of the `/project/` bind mount in the `sign` service
+  is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
+  between build types.
 - Run `docker compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
-  (e.g, the `50000` in `50000:8000`), making it accessible in your browser
-  (i.e, `localhost:50000`).
+  (i.e, the `12345` in `12345:8000`), making it accessible in your browser
+  (i.e, `localhost:12345`).
+  Make sure the source of the `/project/` bind mount in the `run` service
+  is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
+  between build types.
+  Note that if your host device isn't using x86_64,
+  you'll first need to change the `APKS` build argument in
+  [`docker-compose.yml`](./docker-compose.yml)
+  to accurately reflect its architecture.
 
 ## Legal things
 

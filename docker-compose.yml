@@ -51,6 +51,8 @@ services:
       target: 'emulate'
       additional_contexts:
         'ws_scrcpy': 'service:ws-scrcpy-with-adb'
+      # args:
+      #   - APKS="Signal-Android-website-prod-arm64-v8a-release-unsigned-7.52.2.apk"
     gpus: 'all'
     devices:
       - source: '/dev/kvm' # Even works with WSL2 (not WSL1)

@@ -68,10 +68,14 @@ First, find the version of Signal that is running on your device by going to `Se
 Next, use `git` to clone that specific version. The tag consists of the version name prefixed with a `v` (e.g. `v7.7.0`):
 
 ```bash
-git clone --depth 1 --branch v7.7.0 https://github.com/signalapp/Signal-Android.git
+git clone --depth 1 --branch v7.7.0 https://github.com/Vessel9817/Signal-Android.git
 ```
 
-You can also download an [archive](https://github.com/signalapp/Signal-Android/tags) of the source code for a specific tag.
+Note that `--depth 1` should be omitted if you intend to later run the project
+in Docker.
+
+You can also download an archive of the source code for a specific tag.
+In GitHub, this can be found in the `tags` section.
 
 Now we are ready to start building the Signal Android app bundle.
 The following commands will invoke the `bundlePlayProdRelease` Gradle task
@@ -210,7 +214,7 @@ If you're able to successfully build and retrieve all of the APKs yet some of th
 
 We have a daily automated task that tests the reproducible build process, but bugs are still possible.
 
-If you're having trouble even after building and pulling all the APKs correctly and trying the troubleshooting steps above, please [open an issue](https://github.com/signalapp/Signal-Android/issues/new/choose).
+If you're having trouble even after building and pulling all the APKs correctly and trying the troubleshooting steps above, please [open an issue](https://github.com/Vessel9817/Signal-Android/issues/new/choose).
 
 If you're having difficulty getting things to build at all, the [community forum](https://community.signalusers.org/c/development) is a great place to ask for advice or get help.
 
