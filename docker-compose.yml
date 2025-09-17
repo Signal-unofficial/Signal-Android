@@ -28,6 +28,16 @@ services:
       - type: 'bind'
         source: './app/build/outputs/'
         target: '/project/'
+  'gen-keystore':
+    container_name: 'keystore-generator'
+    build:
+      context: './reproducible-builds/'
+      dockerfile: './Dockerfile'
+      target: 'gen_keystore'
+    volumes:
+      - type: 'bind'
+        source: './reproducible-builds/secrets/'
+        target: '/project/'
   'sign':
     build:
       context: './reproducible-builds/'

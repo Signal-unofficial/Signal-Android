@@ -89,6 +89,23 @@ CMD [ \
     "--output=apks" \
 ]
 
+# Generates a signature keystore
+FROM base AS gen_keystore
+
+RUN \
+    apt-get update -qq \
+    && apt-get install -yqq openjdk-17-jre \
+    && apt-get clean -qq
+
+WORKDIR /project/
+ENTRYPOINT [ "keytool", "-genkey" ]
+CMD [ \
+    "-keyalg", "RSA", \
+    "-keysize", "4096", \
+    "-keystore", "dev.keystore", \
+    "-alias", "Signal" \
+]
+
 # Signs all files (presumably unsigned APKs) in the workdir
 FROM build AS sign
 

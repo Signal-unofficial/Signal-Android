@@ -85,7 +85,8 @@ Looking for documentation? Check out the wiki!
   When the build completes, run `docker compose run -d --rm package`
   to create unsigned `.apk` files in [`splits`](./app/build/outputs/apks/splits).
   This operation is significantly faster.
-- Run `./gen-keystore` to generate the keys necessary for signing the APKs.
+- Run `docker compose run --rm -it gen-keystore` to generate the keys
+  in the console necessary for signing the APKs.
   Use a unique, secure password that you'll remember, as you'll
   need it in later steps. Note that in a production setting, this file would
   not be regenerated frequently, but rather reused until its expiry nears.
