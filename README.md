@@ -61,6 +61,12 @@ Looking for documentation? Check out the wiki!
 
 ## Building From Source
 
+- Clone the repository:
+
+  ```shell
+  git clone https://github.com/Signal-unofficial/Signal-Android --recurse-submodules
+  ```
+
 - Install Docker Desktop
 - Run `docker compose run -d --rm build <BUILD_TYPE>`, where `<BUILD_TYPE>`
   is `bundlePlayProdRelease` (split build) or `assembleWebsiteProdRelease`
