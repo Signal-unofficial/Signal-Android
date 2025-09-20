@@ -46,7 +46,7 @@ Truths which we believe to be self-evident:
 1. Please search both open and closed issues to make sure your bug report
   isn't a duplicate.
 1. Read the
-  [guide to submitting useful bug reports](https://github.com/Vessel9817/Signal-Android/wiki/Submitting-useful-bug-reports)
+  [guide to submitting useful bug reports](https://github.com/Signal-unofficial/Signal-Android/wiki/Submitting-useful-bug-reports)
   before posting a bug.
 
 ### The issue tracker is for bugs, not feature requests
@@ -70,7 +70,7 @@ Conversations about open bug reports belong here. However, all other discussions
 ### Don't bump issues
 
 Every time someone comments on an issue, GitHub sends an email to
-[everyone watching the repository](https://github.com/Vessel9817/Signal-Android/watchers).
+[everyone watching the repository](https://github.com/Signal-unofficial/Signal-Android/watchers).
 Bumping issues with a "+1" (or asking for updates) generates
 a lot of unnecessary email notifications and does not help anyone solve
 the issue any faster. Please be respectful of everyone's time
@@ -115,7 +115,7 @@ before your pull request can be merged.
 ### Follow the Code Style Guidelines
 
 Ensure that your code adheres to the
-[Code Style Guidelines](https://github.com/Vessel9817/Signal-Android/wiki/Code-Style-Guidelines)
+[Code Style Guidelines](https://github.com/Signal-unofficial/Signal-Android/wiki/Code-Style-Guidelines)
 before submitting a pull request.
 
 You can run `./gradlew format` to automatically check conformance with some of these guidelines.
@@ -144,7 +144,7 @@ There are several other ways to get involved:
   * Redirect non-bug discussions to the
     [community forum](https://community.signalusers.org).
 * Improve documentation in the
-  [wiki](https://github.com/Vessel9817/Signal-Android/wiki).
+  [wiki](https://github.com/Signal-unofficial/Signal-Android/wiki).
 * Find and mark duplicate issues.
 * Try to reproduce issues and help with troubleshooting.
 * Discover solutions to open issues and post any relevant findings.

@@ -1,12 +1,12 @@
 <!-- You can remove this first section if you have contributed before -->
 ### First time contributor checklist
 <!-- replace the empty checkboxes [ ] below with checked ones [x] accordingly -->
-- [ ] I have read [how to contribute](https://github.com/Vessel9817/Signal-Android/blob/main/CONTRIBUTING.md) to this project
+- [ ] I have read [how to contribute](https://github.com/Signal-unofficial/Signal-Android/blob/main/CONTRIBUTING.md) to this project
 - [ ] I have signed the [Contributor License Agreement](https://signal.org/cla/)
 
 ### Contributor checklist
 <!-- replace the empty checkboxes [ ] below with checked ones [x] accordingly -->
-- [ ] I am following the [Code Style Guidelines](https://github.com/Vessel9817/Signal-Android/wiki/Code-Style-Guidelines)
+- [ ] I am following the [Code Style Guidelines](https://github.com/Signal-unofficial/Signal-Android/wiki/Code-Style-Guidelines)
 - [ ] I have tested my contribution on these devices:
  * Device A, Android X.Y.Z
  * Device B, Android Z.Y

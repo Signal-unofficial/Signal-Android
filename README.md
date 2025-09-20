@@ -14,7 +14,7 @@ Currently available on the Play Store and [signal.org](https://signal.org/androi
 
 We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
-[https://github.com/Vessel9817/Signal-Android/issues]
+[https://github.com/Signal-unofficial/Signal-Android/issues]
 
 ## Joining the Beta
 
@@ -57,7 +57,7 @@ For troubleshooting and questions, please visit our support center!
 
 Looking for documentation? Check out the wiki!
 
-[https://github.com/Vessel9817/Signal-Android/wiki]
+[https://github.com/Signal-unofficial/Signal-Android/wiki]
 
 ## Building From Source
 

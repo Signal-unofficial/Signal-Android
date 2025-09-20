@@ -15,7 +15,7 @@ body:
     id: guidelines
     attributes:
       label: "Guidelines"
-      description: "Search issues here: https://github.com/Vessel9817/Signal-Android/issues/?q=is%3Aissue+"
+      description: "Search issues here: https://github.com/Signal-unofficial/Signal-Android/issues/?q=is%3Aissue+"
       options:
         - label: I have searched searched open and closed issues for duplicates
           required: true
