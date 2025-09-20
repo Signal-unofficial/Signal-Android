@@ -217,9 +217,9 @@ CMD [ \
 ]
 
 # For browser and AVD requirements, see:
-# https://github.com/Vessel9817/ws-scrcpy/tree/signal-android?tab=readme-ov-file#requirements
+# https://github.com/Signal-unofficial/ws-scrcpy/tree/signal-android?tab=readme-ov-file#requirements
 #
 # For security warnings, see:
-# https://github.com/Vessel9817/ws-scrcpy/tree/signal-android?tab=readme-ov-file#security-warning
+# https://github.com/Signal-unofficial/ws-scrcpy/tree/signal-android?tab=readme-ov-file#security-warning
 WORKDIR /project/
 ENTRYPOINT [ "bash", "-c", "source \"${NVM_DIR}/nvm.sh\" && exec '/usr/local/bin/docker-entrypoint.sh' \"$@\"", "--" ]
