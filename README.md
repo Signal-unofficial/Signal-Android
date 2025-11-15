@@ -4,7 +4,8 @@ Signal is a simple, powerful, and secure messenger.
 
 Signal uses your phone's data connection (WiFi/3G/4G/5G) to communicate securely. Millions of people use Signal every day for free and instantaneous communication anywhere in the world. Send and receive high-fidelity messages, participate in HD voice/video calls, and explore a growing set of new features that help you stay connected. Signal’s advanced privacy-preserving technology is always enabled, so you can focus on sharing the moments that matter with the people who matter to you.
 
-Currently available on the Play Store and [signal.org](https://signal.org/android/apk/).
+**This is an unofficial build of Signal.** The official build
+is currently available on the Play Store and <https://signal.org/android/apk/>.
 
 <a href='https://play.google.com/store/apps/details?id=org.thoughtcrime.securesms&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
   <img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/>
@@ -14,14 +15,14 @@ Currently available on the Play Store and [signal.org](https://signal.org/androi
 
 We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
-[https://github.com/Signal-unofficial/Signal-Android/issues]
+<https://github.com/Signal-unofficial/Signal-Android/issues>
 
 ## Joining the Beta
 
 Want to live life on the bleeding edge and help out with testing?
 
-You can subscribe to Signal Android Beta releases here:
-[https://play.google.com/apps/testing/org.thoughtcrime.securesms]
+You can [subscribe](https://play.google.com/apps/testing/org.thoughtcrime.securesms)
+to Signal Android Beta releases!
 
 If you're interested in a life of peace and tranquility,
 stick with the standard releases.
@@ -43,21 +44,13 @@ Have something you want to say about Signal projects or want to be part of
 the conversation? Get involved in the
 [community forum](https://community.signalusers.org).
 
-Help
-
-====
-
 ## Support
 
-For troubleshooting and questions, please visit our support center!
-
-[https://support.signal.org/]
+For troubleshooting and questions, please visit our [support center](https://support.signal.org)!
 
 ## Documentation
 
-Looking for documentation? Check out the wiki!
-
-[https://github.com/Signal-unofficial/Signal-Android/wiki]
+Looking for documentation? Check out the [wiki](https://github.com/Signal-unofficial/Signal-Android/wiki)!
 
 ## Building From Source
 
@@ -83,7 +76,7 @@ Looking for documentation? Check out the wiki!
     - Android SDK 12.0+ (or the much larger Android Studio app that includes it)
     The `build` stage of the relevant [Dockerfile](./Dockerfile) contains steps
     for installing these tools on Ubuntu 24.04 (Noble), as well as running the build itself.
-    If ever this information is incorrect or outdated, see the Dockerfile instead.
+    *If ever this README's information is incorrect or outdated, see the Dockerfile instead.*
   - If your PC does meet this memory requirement, but Docker doesn't use
     that much memory (defaults to 50% of the maximum host memory), see:
     [raising the Docker memory limit](https://docs.docker.com/desktop/settings-and-maintenance/settings/#advanced).
@@ -98,20 +91,20 @@ Looking for documentation? Check out the wiki!
   not be regenerated frequently, but rather reused until its expiry nears.
 - Run `docker compose run -it --rm sign` to sign the APKs through the console.
   Feel free to backup the unsigned APKs in another folder beforehand.
-  Make sure the source of the `/project/` bind mount in the `sign` service
-  is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
-  between build types.
+  - Make sure the source of the `/project/` bind mount in the `sign` service
+    is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
+    between build types.
 - Run `docker compose up -d run` to run an emulator with the APKs installed.
   Docker will expose the emulator on a random port
   (i.e, the `12345` in `12345:8000`), making it accessible in your browser
-  (i.e, `localhost:12345`).
-  Make sure the source of the `/project/` bind mount in the `run` service
-  is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
-  between build types.
-  Note that if your host device isn't using x86_64,
-  you'll first need to change the `APKS` build argument in
-  [`docker-compose.yml`](./docker-compose.yml)
-  to accurately reflect its architecture.
+  (i.e, through `localhost:12345`).
+  - Make sure the source of the `/project/` bind mount in the `run` service
+    is correct in [`docker-compose.yml`](./docker-compose.yml), as it differs
+    between build types.
+  - Note that if your host device isn't built on x86_64 architecture,
+    you'll first need to change the `APKS` build argument in
+    [`docker-compose.yml`](./docker-compose.yml)
+    to accurately reflect its architecture.
 
 ## Legal things
 
@@ -138,6 +131,6 @@ object code and source code.
 
 Copyright 2013-2025 Signal Messenger, LLC
 
-Licensed under the GNU AGPLv3: [https://www.gnu.org/licenses/agpl-3.0.html]
+Licensed under the GNU AGPLv3: <https://www.gnu.org/licenses/agpl-3.0.html>
 
 Google Play and the Google Play logo are trademarks of Google LLC.
